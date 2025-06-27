@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teradek Bolt 6XT 1500 – 6GHz의 시대</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    :root {
+      --bg: #000;
+      --text: #f5f5f7;
+      --text-sec: #a1a1a6;
+      --accent: #007aff;
+      --card: #1d1d1f;
+      --border: #424245;
+      --danger: #ff453a;
+      --success: #30d158;
+      --warning: #ff9500;
+    }
+    html { font-size:130%; background:var(--bg); }
+    body {
+      margin:0; padding:0;
+      color:var(--text);
+      font-family:'Noto Sans KR',sans-serif;
+      overflow:hidden; height:100vh;
+    }
+    .scroll-container {
+      height:100vh; overflow-y:scroll;
+      scroll-snap-type:y mandatory;
+    }
+    .page {
+      height:100vh; scroll-snap-align:start;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      text-align:center; padding:0 20px;
+      position:relative;
+    }
+    .reveal {
+      opacity:0; transform:translateY(40px);
+      transition:opacity .8s ease,transform .8s ease;
+    }
+    .page.visible .reveal { opacity:1; transform:translateY(0); }
+    .container { width:100%; max-width:980px; margin:0 auto; }
+
+    /* Fixed header */
+    .header {
+      position:fixed; top:0; left:0; right:0;
+      height:60px; background:var(--bg);
+      box-shadow:0 2px 10px rgba(0,0,0,0.5);
+      display:flex; align-items:center; z-index:100;
+    }
+    .header .container {
+      display:flex; align-items:center; justify-content:flex-start;
+      width:100%; max-width:980px; padding-left:1cm;
+    }
+    .logo img { height:60px; margin-right:1rem; }
+    .nav-links a {
+      margin:0 16px; color:var(--text);
+      text-decoration:none; font-size:1rem; font-weight:500;
+    }
+    .nav-links a:hover { color:var(--accent); }
+
+    /* 1. Hero */
+    .hero {
+      background:radial-gradient(circle,#1a2040 0%,#0a1020 100%);
+      color:#fff; padding-top:60px;
+    }
+    .hero img {
+      width:100%; max-width:800px;
+      border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.3);
+      margin-bottom:30px;
+    }
+    .badge {
+      display:inline-block;
+      background:rgba(255,255,255,0.2); backdrop-filter:blur(8px);
+      padding:8px 20px; border-radius:20px;
+      border:1px solid rgba(255,255,255,0.3);
+      font-weight:600; margin-bottom:20px;
+    }
+    .hero h1 {
+      font-size:6rem; font-weight:900; margin-bottom:10px;
+      background:linear-gradient(45deg,#fff,#e0e0e0);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero .subheading {
+      font-size:1.4rem; color:rgba(255,255,255,0.9);
+      margin-bottom:40px; font-weight:300;
+    }
+
+    /* 2. 6GHz의 혁신 */
+    .page-2 { background:var(--card); padding-top:60px; }
+    .small-title { font-size:1rem; color:var(--accent); margin-bottom:8px; font-weight:500; }
+    .title { font-size:2.5rem; font-weight:700; margin-bottom:16px; }
+    .desc {
+      font-size:1.1rem; color:var(--text-sec);
+      line-height:1.6; margin:0 auto 40px; max-width:700px;
+    }
+    .timeline-image-container img {
+      width:100%; max-width:900px; border-radius:20px;
+      box-shadow:0 10px 40px rgba(44,62,80,0.3); margin-bottom:40px;
+    }
+    .comparison-grid {
+      display:grid; grid-template-columns:repeat(2,1fr);
+      gap:30px; max-width:900px; margin:0 auto;
+    }
+    .comparison-card {
+      background:var(--card); padding:30px; border-radius:15px;
+      text-align:left; border:1px solid var(--border);
+      border-top:5px solid; transition:transform .3s ease;
+    }
+    .comparison-card.problem { border-top-color:var(--danger); }
+    .comparison-card.solution { border-top-color:var(--success); }
+    .comparison-card h4 { font-size:1.5rem; margin-bottom:15px; }
+    .comparison-card p { color:var(--text-sec); font-size:1.1rem; line-height:1.7; }
+    .comparison-card:hover { transform:translateY(-5px); }
+
+    /* 3. 성능 비교 */
+    .page-3 { background:var(--bg); padding-top:60px; }
+    .page-3 h2 { font-size:3rem; font-weight:700; margin-bottom:16px; }
+    .page-3 .subheading { font-size:1.2rem; color:var(--text-sec); margin-bottom:30px; font-weight:300; }
+    .page-3 .graph svg { width:100%; max-width:600px; }
+    .page-3 .table-wrap { max-width:1000px; margin:30px auto; }
+    .page-3 table { width:100%; border-collapse:collapse; }
+    .page-3 th, .page-3 td { white-space:nowrap; padding:12px 16px; text-align:left; }
+    .page-3 th { background:var(--accent); color:#fff; font-weight:700; }
+    .page-3 td { border-bottom:1px solid var(--border); color:var(--text-sec); }
+    .page-3 tr:last-child td { border-bottom:none; }
+    .page-3 .rating { font-size:1.2rem; }
+
+    /* 4. 국가별 사용 현황 */
+    .page-4 { background:var(--card); padding-top:60px; }
+    .page-4 .section-title { font-size:2rem; font-weight:700; margin-bottom:16px; letter-spacing:-0.02em; }
+    .page-4 .section-subtitle { font-size:1rem; color:var(--text-sec); margin-bottom:30px; font-weight:300; }
+    .page-4 .stats-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:16px; margin:40px 0;
+    }
+    .page-4 .stat-card { background:var(--card); border-radius:15px; padding:20px; text-align:center; border:1px solid var(--border); transition:transform .3s ease; }
+    .page-4 .stat-card:hover { transform:translateY(-5px); }
+    .page-4 .stat-number { font-size:2.2rem; font-weight:900; margin-bottom:8px; }
+    .page-4 .stat-available .stat-number { color:var(--success); }
+    .page-4 .stat-unavailable .stat-number { color:var(--danger); }
+    .page-4 .stat-total .stat-number { color:var(--accent); }
+    .page-4 .stat-label { font-size:1.1rem; font-weight:600; color:var(--text-sec); }
+
+    .page-4 .progress-section { margin:30px 0; text-align:center; }
+    .page-4 .progress-title { font-size:1.3rem; font-weight:700; margin-bottom:12px; }
+    .page-4 .progress-bar { background:rgba(255,255,255,0.1); border-radius:25px; height:14px; overflow:hidden; margin:12px 0; position:relative; }
+    .page-4 .progress-fill {
+      background:linear-gradient(90deg,var(--success)0%,var(--accent)100%);
+      height:100%; border-radius:25px; width:80%;
+      animation:fillProgress 2s ease forwards; position:relative;
+    }
+    @keyframes fillProgress { from{width:0;} to{width:80%;} }
+    .page-4 .progress-fill::after {
+      content:'80%'; position:absolute; right:10px; top:50%;
+      transform:translateY(-50%); color:#fff; font-weight:700; font-size:.9rem;
+    }
+    .page-4 .progress-description { color:var(--text-sec); font-size:1rem; margin-top:10px; }
+
+    .page-4 .world-chart { background:var(--card); border-radius:20px; padding:40px; margin:40px 0; border:1px solid var(--border); }
+    .page-4 .chart-title { font-size:2rem; font-weight:700; margin-bottom:15px; }
+    .page-4 .chart-subtitle { font-size:1.1rem; color:var(--text-sec); }
+    .page-4 .countries-grid {
+      display:grid; grid-template-columns:repeat(5,1fr);
+      gap:12px; margin:40px 0;
+    }
+    .page-4 .country-card {
+      background:rgba(255,255,255,0.05);
+      border-radius:12px; padding:16px;
+      text-align:center; border:2px solid transparent;
+      overflow:hidden; transition:transform .3s ease,box-shadow .3s ease;
+      animation:slideInUp .6s ease forwards; opacity:0; transform:translateY(30px);
+    }
+    .page-4 .country-card.available { border-color:var(--success); background:rgba(48,209,88,0.1); }
+    .page-4 .country-card.unavailable { border-color:var(--danger); background:rgba(255,69,58,0.1); }
+    .page-4 .country-card:hover { transform:translateY(-5px) scale(1.02); box-shadow:0 15px 30px rgba(0,0,0,0.3); }
+    .page-4 .country-flag { font-size:2.2rem; margin-bottom:8px; display:block; }
+    .page-4 .country-name { font-size:1.1rem; font-weight:700; margin-bottom:6px; }
+    .page-4 .country-code { font-size:.8rem; color:var(--text-sec); margin-bottom:10px; }
+    .page-4 .status-badge { display:inline-block; padding:6px 12px; border-radius:20px; font-size:.8rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .page-4 .status-available { background:var(--success); color:#fff; }
+    .page-4 .status-unavailable { background:var(--danger); color:#fff; }
+
+    /* 5. 승인 임팩트 */
+    .page-5 { background:var(--bg); padding-top:60px; }
+    .page-5 .container { padding-top:100px; }
+    .page-5 .impact h1 {
+      font-size:4rem; font-weight:900; line-height:1.2;
+    }
+    .page-5 .impact h1 span { display:block; white-space:nowrap; }
+
+    /* 6. 안테나 이미지 */
+    .page-6 { background:var(--card); padding-top:60px; }
+    .page-6 .section-title { font-size:3rem; font-weight:700; text-align:center; margin-bottom:20px; }
+    .page-6 .section-subtitle { font-size:1.2rem; color:var(--text-sec); text-align:center; margin-bottom:50px; }
+    .antenna-image-container {
+      background:#f5f5f7; border-radius:20px; padding:60px 40px;
+      margin:50px auto; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.2);
+      text-align:center;
+    }
+    .antenna-image-container img { max-width:100%; border-radius:15px; }
+
+    /* 7. 안테나 Guide 카드 */
+    .page-7 { background:var(--card); padding-top:60px; }
+    .page-7 .section-title { font-size:3rem; font-weight:700; text-align:center; margin-bottom:20px; }
+    .guide-cards {
+      display:grid; grid-template-columns:1fr 1fr; gap:40px;
+      max-width:900px; margin:0 auto;
+    }
+    .guide-card {
+      background:var(--card); border-radius:20px; padding:40px 30px;
+      position:relative; overflow:hidden; transition:all .3s ease;
+    }
+    .guide-card.correct { border-left:4px solid var(--success); background:rgba(48,209,88,0.05); }
+    .guide-card.incorrect { border-left:4px solid var(--danger); background:rgba(255,69,58,0.05); }
+    .guide-card::before {
+      content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);
+      transition:left .5s ease;
+    }
+    .guide-card:hover::before { left:100%; }
+    .guide-card:hover { transform:translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.3); }
+    .guide-header { display:flex; align-items:center; margin-bottom:25px; }
+    .guide-icon { font-size:2rem; margin-right:15px; }
+    .guide-icon.correct { color:var(--success); }
+    .guide-icon.incorrect { color:var(--danger); }
+    .guide-title { font-size:1.8rem; font-weight:700; }
+    .guide-title.correct { color:var(--success); }
+    .guide-title.incorrect { color:var(--danger); }
+    .guide-list { list-style:none; padding:0; }
+    .guide-list li {
+      margin-bottom:20px; padding-left:25px; position:relative;
+      color:var(--text-sec); line-height:1.6;
+    }
+    .guide-list li::before {
+      content:'•'; position:absolute; left:0; font-size:1.2rem; font-weight:bold;
+    }
+    .guide-card.correct .guide-list li::before { color:var(--success); }
+    .guide-card.incorrect .guide-list li::before { color:var(--danger); }
+
+    @keyframes slideInUp { to { opacity:1; transform:translateY(0); } }
+    @media(max-width:768px){
+      .page-6 .antenna-image-container { padding:40px 20px; }
+      .guide-cards { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-container">
+
+    <!-- Page 1: Hero -->
+    <section id="hero" class="page hero">
+      <div class="container reveal">
+        <img src="teradek_6ghz_banner.png" alt="6GHz Banner"/>
+        <div class="badge">🚀 NEW 6GHz 주파수 지원</div>
+        <h1>Teradek Bolt 6XT 1500</h1>
+        <p class="subheading">비교 불가한 6GHz 시대,<br/>간섭과의 전쟁을 끝낼 단 하나의 솔루션</p>
+      </div>
+    </section>
+
+    <!-- Page 2: 6GHz의 혁신 -->
+    <section id="innovation" class="page page-2">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal">
+        <div class="small-title">더 많은 채널, 더 적은 간섭</div>
+        <div class="title">신선한 전파의 숨결</div>
+        <div class="desc">
+          Bolt 6는 기존 5GHz 옵션에 12개의 새로운 6GHz 채널을 추가합니다.<br/>
+          간섭 없이 최적의 채널을 찾을 때,<br/>
+          선택 가능한 주파수 수가 두 배로 늘어납니다.<br/>
+          주파수가 많을수록 신호가 더 좋아집니다.
+        </div>
+        <div class="timeline-image-container reveal">
+          <img src="timeline.png" alt="6GHz 채널 타임라인"/>
+        </div>
+        <div class="comparison-grid reveal">
+          <div class="comparison-card problem">
+            <h4>기존 5GHz의 한계</h4>
+            <p>많은 장비 사용으로 혼잡하고, 장애물 투과율이 낮아 신호 불안정 발생 가능.</p>
+          </div>
+          <div class="comparison-card solution">
+            <h4>6GHz의 우수성</h4>
+            <p>간섭이 거의 없으며, 선택 가능한 채널 수가 대폭 증가해 안정적 전송 보장.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 3: 성능 비교 -->
+    <section id="comparison" class="page page-3">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal">
+        <h2>성능 비교</h2>
+        <p class="subheading">2.4 GHz · 5 GHz · 6 GHz 성능 한눈에</p>
+        <div class="graph reveal">
+          <svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">
+            <line x1="40" y1="200" x2="280" y2="200" stroke="var(--border)" stroke-width="1"/>
+            <rect x="60" y="150" width="40" height="50" fill="var(--danger)"/>
+            <text x="80" y="170" text-anchor="middle" fill="var(--text)">2.4 GHz</text>
+            <rect x="135" y="110" width="40" height="90" fill="var(--accent)"/>
+            <text x="155" y="130" text-anchor="middle" fill="var(--text)">5 GHz</text>
+            <rect x="210" y="60" width="40" height="140" fill="var(--success)"/>
+            <text x="230" y="80" text-anchor="middle" fill="var(--text)">6 GHz</text>
+            <text x="150" y="30" text-anchor="middle" fill="var(--text)" font-size="14">대역폭·간섭 대비</text>
+          </svg>
+        </div>
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr><th>주파수</th><th>장점</th><th>단점</th><th>추천도</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2.4 GHz</td><td>장애물 투과율↑ 호환성 높음</td><td>대역폭↓·혼잡</td><td class="rating">⭐⭐</td></tr>
+              <tr><td>5 GHz</td><td>대역폭↑↑·적당한 혼잡</td><td>장애물 투과율↓ 약간</td><td class="rating">⭐⭐⭐</td></tr>
+              <tr><td>6 GHz</td><td>간섭 거의 없음·채널 수↑↑↑</td><td>지역 제한·도달거리↓</td><td class="rating">⭐⭐⭐⭐⭐</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 4: 국가별 사용 현황 -->
+    <section id="status" class="page page-4">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal">
+        <h1 class="section-title">국가별 사용 현황</h1>
+        <p class="section-subtitle">전 세계 6GHz 주파수 대역 허용 현황을 한눈에</p>
+        <div class="stats-grid">
+          <div class="stat-card stat-available"><div class="stat-number">4</div><div class="stat-label">사용 가능 국가</div></div>
+          <div class="stat-card stat-unavailable"><div class="stat-number">1</div><div class="stat-label">사용 제한 국가</div></div>
+          <div class="stat-card stat-total"><div class="stat-number">5</div><div class="stat-label">총 조사 국가</div></div>
+        </div>
+        <div class="progress-section">
+          <h3 class="progress-title">전체 허용 비율</h3>
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <p class="progress-description">조사 대상 국가 중 80%가 6GHz 대역 사용을 허용합니다</p>
+        </div>
+        <div class="world-chart reveal">
+          <div class="chart-title">🌍 글로벌 6GHz 허용 현황</div>
+          <p class="chart-subtitle">주요 국가별 허용 여부</p>
+          <div class="countries-grid">
+            <div class="country-card available"><span class="country-flag">🇺🇸</span><div class="country-name">미국</div><div class="country-code">US</div><span class="status-badge status-available">사용 가능</span></div>
+            <div class="country-card available"><span class="country-flag">🇨🇦</span><div class="country-name">캐나다</div><div class="country-code">CA</div><span class="status-badge status-available">사용 가능</span></div>
+            <div class="country-card available"><span class="country-flag">🇪🇺</span><div class="country-name">EU</div><div class="country-code">EU</div><span class="status-badge status-available">사용 가능</span></div>
+            <div class="country-card available"><span class="country-flag">🇬🇧</span><div class="country-name">영국</div><div class="country-code">GB</div><span class="status-badge status-available">사용 가능</span></div>
+            <div class="country-card unavailable"><span class="country-flag">🇰🇷</span><div class="country-name">한국</div><div class="country-code">KR</div><span class="status-badge status-unavailable">사용 제한</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 5: 승인 임팩트 -->
+    <section id="approval-impact" class="page page-5">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal impact">
+        <h1>
+          <span>✅ Teradek 본사의 협조를 받아</span>
+          <span>6GHz를 사용할 수 있게 업데이트 받았습니다.</span>
+        </h1>
+      </div>
+    </section>
+
+    <!-- Page 6: 안테나 이미지 -->
+    <section id="antenna" class="page page-6">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal">
+        <h1 class="section-title">안테나 Guide</h1>
+        <p class="section-subtitle">성능의 차이는 디테일에서 시작됩니다.</p>
+        <div class="antenna-image-container reveal">
+          <img src="teradek_antenna_guide.png" alt="안테나 설정 가이드"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page 7: 안테나 Guide 카드 -->
+    <section id="antenna-cards" class="page page-7">
+      <header class="header reveal">
+        <div class="container">
+          <a href="#hero" class="logo"><img src="teradek_logo.png" alt="TERADEK"/></a>
+          <nav class="nav-links">
+            <a href="#innovation">6GHz의 혁신</a>
+            <a href="#comparison">성능 비교</a>
+            <a href="#status">국가별 사용 현황</a>
+            <a href="#antenna">안테나 Guide</a>
+          </nav>
+        </div>
+      </header>
+      <div class="container reveal">
+        <h1 class="section-title">안테나 Guide</h1>
+        <div class="guide-cards">
+          <div class="guide-card correct">
+            <div class="guide-header">
+              <span class="guide-icon correct">✓</span>
+              <h3 class="guide-title correct">올바른 배치</h3>
+            </div>
+            <ul class="guide-list">
+              <li><strong>수직 방향 배치:</strong> 안테나는 항상 수직 방향으로 배치해야 최적의 성능을 냅니다.</li>
+              <li><strong>시야 확보 (LOS):</strong> 장애물을 피해 직선 시야를 확보하세요.</li>
+              <li><strong>간섭 최소화:</strong> 다른 전자장비와 거리를 두세요.</li>
+              <li><strong>순정 안테나 사용:</strong> 특정 주파수 최적화된 순정 안테나만 사용하세요.</li>
+            </ul>
+          </div>
+          <div class="guide-card incorrect">
+            <div class="guide-header">
+              <span class="guide-icon incorrect">✗</span>
+              <h3 class="guide-title incorrect">잘못된 배치</h3>
+            </div>
+            <ul class="guide-list">
+              <li>안테나를 눕히거나 과도하게 꺾는 행위</li>
+              <li>송신기·수신기 안테나가 서로 다른 방향을 향하는 경우</li>
+              <li>여러 안테나를 겹쳐 배치하는 경우</li>
+              <li>안테나 끝이 서로를 향하게 하는 경우</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    document.querySelectorAll('.page').forEach(section => {
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      }, { threshold: 0.4 }).observe(section);
+    });
+  </script>
+</body>
+</html>
